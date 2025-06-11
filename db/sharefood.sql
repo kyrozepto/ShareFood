@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 11 Jun 2025 pada 19.26
+-- Waktu pembuatan: 11 Jun 2025 pada 19.47
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -32,24 +32,25 @@ CREATE TABLE `donations` (
   `user_id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
-  `quantity` varchar(50) NOT NULL,
   `expiry_date` date DEFAULT NULL,
   `location` text NOT NULL,
   `donation_status` enum('available','confirmed','completed','canceled') DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `donation_picture` text DEFAULT NULL
+  `donation_picture` text DEFAULT NULL,
+  `quantity_value` decimal(10,2) NOT NULL,
+  `quantity_unit` enum('kg','g','liter','ml','pcs','pack') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `donations`
 --
 
-INSERT INTO `donations` (`donation_id`, `user_id`, `title`, `description`, `quantity`, `expiry_date`, `location`, `donation_status`, `created_at`, `donation_picture`) VALUES
-(1, 1, 'Canned Tuna - 5 cans', '5 unopened cans of tuna in good condition. Best before July 2025.', '5 cans', '2025-07-01', 'Jl. Merdeka No. 123, Jakarta', 'available', '2025-06-11 05:39:42', NULL),
-(2, 1, 'Roti dan makanan ringan', 'Beberapa roti dan makanan ringan yang seminggu lagi mendekati tanggal kadaluarsa. Masih sangat layak untuk di makan', '5 pack', NULL, 'BNI ATM UPN \"Veteran\" Jawa Timur', 'available', '2025-06-11 06:15:49', NULL),
-(3, 1, 'Mie Instan', 'Kadaluarsa dalam 1 bulan', '7 pack', NULL, 'ATM UPN Veteran Jawa Timur', 'completed', '2025-06-11 06:20:14', 'https://ik.imagekit.io/choandrew/satoru-gojo-from-jujutsu-kaisen_3840x2160_xtrafondos.com_VISZwuDuF.jpg'),
-(6, 1, 'Beras', 'Beras masih bisa dikonsumsi dalam jangka waktu panjang', '5 kg', '2025-07-07', 'Indomaret Medokan Ayu', 'available', '2025-06-11 06:34:51', 'https://ik.imagekit.io/choandrew/satoru-gojo-from-jujutsu-kaisen_3840x2160_xtrafondos.com_L5MxSHOIk.jpg'),
-(7, 7, 'Beras', 'Beras lebihan panen', '6 kg', '2025-09-10', 'Jl. Mojopahit, Wunut, Sidoarjo (Rumah Pagar Putih)', 'completed', '2025-06-11 23:35:39', 'https://ik.imagekit.io/choandrew/itachi-uchiha-red-crows-dark-atmosphere-desktop-wallpaper_zDowRhUeo.jpg');
+INSERT INTO `donations` (`donation_id`, `user_id`, `title`, `description`, `expiry_date`, `location`, `donation_status`, `created_at`, `donation_picture`, `quantity_value`, `quantity_unit`) VALUES
+(1, 1, 'Canned Tuna - 5 cans', '5 unopened cans of tuna in good condition. Best before July 2025.', '2025-07-01', 'Jl. Merdeka No. 123, Jakarta', 'available', '2025-06-11 05:39:42', NULL, 0.00, 'kg'),
+(2, 1, 'Roti dan makanan ringan', 'Beberapa roti dan makanan ringan yang seminggu lagi mendekati tanggal kadaluarsa. Masih sangat layak untuk di makan', NULL, 'BNI ATM UPN \"Veteran\" Jawa Timur', 'available', '2025-06-11 06:15:49', NULL, 0.00, 'kg'),
+(3, 1, 'Mie Instan', 'Kadaluarsa dalam 1 bulan', NULL, 'ATM UPN Veteran Jawa Timur', 'completed', '2025-06-11 06:20:14', 'https://ik.imagekit.io/choandrew/satoru-gojo-from-jujutsu-kaisen_3840x2160_xtrafondos.com_VISZwuDuF.jpg', 0.00, 'kg'),
+(6, 1, 'Beras', 'Beras masih bisa dikonsumsi dalam jangka waktu panjang', '2025-07-07', 'Indomaret Medokan Ayu', 'available', '2025-06-11 06:34:51', 'https://ik.imagekit.io/choandrew/satoru-gojo-from-jujutsu-kaisen_3840x2160_xtrafondos.com_L5MxSHOIk.jpg', 0.00, 'kg'),
+(7, 7, 'Beras', 'Beras lebihan panen', '2025-09-10', 'Jl. Mojopahit, Wunut, Sidoarjo (Rumah Pagar Putih)', 'completed', '2025-06-11 23:35:39', 'https://ik.imagekit.io/choandrew/itachi-uchiha-red-crows-dark-atmosphere-desktop-wallpaper_zDowRhUeo.jpg', 0.00, 'kg');
 
 -- --------------------------------------------------------
 
