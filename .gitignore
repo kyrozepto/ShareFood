@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv
+.env
+
+# OS-specific
+.DS_Store
+
+# Logs
+logs
+*.log
+logs/**/*.log
+
+# Editor folders
+.vscode/
+.idea/
+
+# Optional: Ignore build/dist folders (if using a build tool)
+dist/
+build/
