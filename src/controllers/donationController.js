@@ -37,84 +37,55 @@ async function getDonationById(req, res) {
 
 async function createDonation(req, res) {
   try {
-    const { title, description, location, quantity, expiry_date } = req.body;
+    const {
+      title,
+      description,
+      location,
+      quantity_value,
+      quantity_unit,
+      expiry_date,
+    } = req.body;
     const user_id = req.user.user_id;
 
-    let photoUrl = null;
-    if (req.file) {
-      photoUrl = await imageUpload(req.file);
-    }
+    if (!title || title.length > 255)
+      return res.status(400).json({ message: "Judul wajib diisi." });
+    if (!description || description.length > 1000)
+      return res.status(400).json({ message: "Deskripsi wajib diisi." });
+    if (!location)
+      return res.status(400).json({ message: "Lokasi wajib diisi." });
+    if (!quantity_value || isNaN(quantity_value))
+      return res.status(400).json({ message: "Jumlah wajib diisi." });
+    if (!["kg", "g", "liter", "ml", "pcs"].includes(quantity_unit))
+      return res.status(400).json({ message: "Satuan tidak valid." });
+    if (!expiry_date)
+      return res
+        .status(400)
+        .json({ message: "Tanggal kadaluarsa wajib diisi." });
 
-    // Validation
-    if (!title || title.length > 255) {
-      return res.status(400).json({
-        message: "Judul donasi harus diisi dan maksimal 255 karakter",
-      });
-    }
-
-    if (!description || description.length > 1000) {
-      return res.status(400).json({
-        message: "Deskripsi harus diisi dan maksimal 1000 karakter",
-      });
-    }
-
-    if (!location) {
-      return res.status(400).json({ message: "Lokasi harus diisi" });
-    }
-
-    if (!quantity || quantity.length > 100) {
-      return res.status(400).json({
-        message: "Jumlah harus diisi dan maksimal 100 karakter",
-      });
-    }
-
-    if (!expiry_date) {
-      return res.status(400).json({
-        message: "Tanggal kadaluarsa harus diisi",
-      });
-    }
-
-    const today = new Date();
-    const expiry = new Date(expiry_date);
-
-    // Clear time to compare dates only
-    today.setHours(0, 0, 0, 0);
-    expiry.setHours(0, 0, 0, 0);
-
-    if (expiry < today) {
-      return res.status(400).json({
-        message: "Tanggal kadaluarsa tidak boleh sebelum hari ini",
-      });
-    }
+    const photoUrl = req.file ? await imageUpload(req.file) : null;
 
     const donationData = {
       user_id,
       title,
       description,
       location,
-      quantity,
+      quantity_value,
+      quantity_unit,
       expiry_date,
+      donation_picture: photoUrl || null,
     };
 
-    if (photoUrl) {
-      donationData.donation_picture = photoUrl;
-    }
-
     Donation.CreateDonation(donationData, (err, newDonation) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Gagal membuat donasi",
-          error: err,
-        });
-      }
+      if (err)
+        return res
+          .status(500)
+          .json({ message: "Gagal membuat donasi", error: err });
       res.status(201).json(newDonation);
     });
   } catch (error) {
-    console.error("Create donation error:", error);
-    res.status(500).json({
-      message: "Terjadi kesalahan saat membuat donasi",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan", error: error.message });
   }
 }
 
@@ -123,24 +94,29 @@ async function updateDonation(req, res) {
     const { id } = req.params;
     const { donation_status } = req.body;
 
-    if (!donation_status) {
-      return res.status(400).json({ message: "donation_status harus diisi" });
-    }
+    if (!donation_status)
+      return res.status(400).json({ message: "donation_status wajib diisi" });
 
-    Donation.updateDonation(id, { donation_status }, (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Gagal mengupdate status donasi",
-          error: err,
-        });
-      }
-      if (result.affectedRows === 0) {
+    Donation.getDonationById(id, (err, donation) => {
+      if (err || !donation)
         return res.status(404).json({ message: "Donasi tidak ditemukan" });
-      }
-      res.status(200).json({ message: "Status donasi berhasil diupdate" });
+
+      const statusToUpdate =
+        donation.quantity_value === 0 ? "completed" : donation_status;
+
+      Donation.updateDonation(
+        id,
+        { donation_status: statusToUpdate },
+        (err, result) => {
+          if (err)
+            return res
+              .status(500)
+              .json({ message: "Gagal update status", error: err });
+          res.status(200).json({ message: "Status donasi diperbarui" });
+        }
+      );
     });
   } catch (error) {
-    console.error("Update donation error:", error);
     res.status(500).json({ message: error.message });
   }
 }

@@ -1,4 +1,5 @@
 const Request = require("../models/Request");
+const Donation = require("../models/Donation");
 const db = require("../config/db");
 
 async function getRequests(req, res) {
@@ -108,67 +109,63 @@ async function updateRequest(req, res) {
     const { id } = req.params;
     const { request_status } = req.body;
 
-    if (!request_status) {
+    if (!request_status)
       return res.status(400).json({ message: "request_status harus diisi" });
-    }
 
-    // First, update the request
-    Request.updateRequest(id, { request_status }, async (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Gagal mengupdate status request",
-          error: err,
-        });
-      }
-
-      if (result.affectedRows === 0) {
+    Request.getRequestById(id, async (err, request) => {
+      if (err || !request)
         return res.status(404).json({ message: "Request tidak ditemukan" });
-      }
 
-      const query = "SELECT donation_id FROM requests WHERE request_id = ?";
-      db.query(query, [id], (err, results) => {
-        if (err || results.length === 0) {
-          return res.status(500).json({
-            message: "Gagal mengambil data donasi dari request",
-            error: err,
-          });
+      if (request_status === "completed") {
+        const [valueStr] = request.requested_quantity.split(" ");
+        const value = parseFloat(valueStr);
+
+        if (isNaN(value)) {
+          return res
+            .status(400)
+            .json({ message: "Format requested_quantity tidak valid" });
         }
 
-        const donation_id = results[0].donation_id;
+        Donation.getDonationById(request.donation_id, (err, donation) => {
+          if (err || !donation) {
+            return res.status(404).json({ message: "Donasi tidak ditemukan" });
+          }
 
-        let donation_status = null;
-        if (request_status === "approved") {
-          donation_status = "confirmed";
-        } else if (request_status === "completed") {
-          donation_status = "completed";
-        }
+          let newQty = parseFloat(donation.quantity_value) - value;
+          if (newQty < 0) newQty = 0;
 
-        if (donation_status) {
-          const updateDonationQuery =
-            "UPDATE donations SET donation_status = ? WHERE donation_id = ?";
-          db.query(
-            updateDonationQuery,
-            [donation_status, donation_id],
+          Donation.updateDonation(
+            request.donation_id,
+            { quantity_value: newQty },
             (err) => {
-              if (err) {
-                return res.status(500).json({
-                  message: "Gagal mengupdate status donasi terkait",
-                  error: err,
-                });
-              }
+              if (err)
+                return res
+                  .status(500)
+                  .json({ message: "Gagal mengurangi jumlah donasi" });
 
-              res.status(200).json({
-                message: "Status request dan status donasi berhasil diupdate",
+              Request.updateRequest(id, { request_status }, (err) => {
+                if (err)
+                  return res
+                    .status(500)
+                    .json({ message: "Gagal mengupdate request" });
+                res.status(200).json({
+                  message: "Request diselesaikan dan donasi dikurangi",
+                });
               });
             }
           );
-        } else {
-          res.status(200).json({ message: "Status request berhasil diupdate" });
-        }
-      });
+        });
+      } else {
+        Request.updateRequest(id, { request_status }, (err) => {
+          if (err)
+            return res
+              .status(500)
+              .json({ message: "Gagal mengupdate request" });
+          res.status(200).json({ message: "Status request diperbarui" });
+        });
+      }
     });
   } catch (error) {
-    console.error("Update request error:", error);
     res.status(500).json({ message: error.message });
   }
 }

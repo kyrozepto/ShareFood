@@ -13,13 +13,15 @@
  *           type: integer
  *         requested_quantity:
  *           type: string
+ *           example: "2 pcs"
  *         pickup_time:
  *           type: string
- *           format: date-time
+ *           format: time
  *         note:
  *           type: string
  *         request_status:
  *           type: string
+ *           enum: [waiting, approved, rejected, completed, canceled]
  *         created_at:
  *           type: string
  *           format: date-time
@@ -33,12 +35,13 @@
  *         - note
  *       properties:
  *         donation_id:
- *           type: string
+ *           type: integer
  *         requested_quantity:
  *           type: string
+ *           example: "3 pcs"
  *         pickup_time:
  *           type: string
- *           format: date-time
+ *           format: time
  *         note:
  *           type: string
  *
@@ -49,7 +52,7 @@
  *       properties:
  *         request_status:
  *           type: string
- *           enum: [pending, approved, completed, rejected]
+ *           enum: [waiting, approved, rejected, completed, canceled]
  */
 
 /**

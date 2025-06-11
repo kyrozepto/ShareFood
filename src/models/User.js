@@ -50,34 +50,9 @@ class User {
     const values = [];
     const params = [];
 
-    if (data.user_name) {
-      fields.push("user_name");
-      values.push("?");
-      params.push(data.user_name);
-    }
-
-    if (data.password) {
-      fields.push("password");
-      values.push("?");
-      params.push(bcrypt.hashSync(data.password, 10));
-    }
-
-    if (data.user_type) {
-      fields.push("user_type");
-      values.push("?");
-      params.push(data.user_type);
-    }
-
-    if (data.phone) {
-      fields.push("phone");
-      values.push("?");
-      params.push(data.phone);
-    }
-
-    if (data.email) {
-      fields.push("email");
-      values.push("?");
-      params.push(data.email);
+    for (let key in data) {
+      updates.push(`${key} = ?`);
+      params.push(data[key]);
     }
 
     const query = `INSERT INTO users (${fields.join(
@@ -98,34 +73,9 @@ class User {
     const fields = [];
     const params = [];
 
-    if (data.user_name) {
-      fields.push("user_name = ?");
-      params.push(data.user_name);
-    }
-
-    if (data.password) {
-      fields.push("password = ?");
-      params.push(bcrypt.hashSync(data.password, 10));
-    }
-
-    if (data.user_type) {
-      fields.push("user_type = ?");
-      params.push(data.user_type);
-    }
-
-    if (data.phone) {
-      fields.push("phone = ?");
-      params.push(data.phone);
-    }
-
-    if (data.email) {
-      fields.push("email = ?");
-      params.push(data.email);
-    }
-
-    if (data.profile_picture) {
-      fields.push("profile_picture = ?");
-      params.push(data.profile_picture);
+    for (let key in data) {
+      updates.push(`${key} = ?`);
+      params.push(data[key]);
     }
 
     if (fields.length === 0) {

@@ -44,29 +44,9 @@ class Rating {
     const values = [];
     const params = [];
 
-    if (data.donation_id) {
-      fields.push("donation_id");
-      values.push("?");
-      params.push(data.donation_id);
-    }
-
-    if (data.user_id) {
-      fields.push("user_id");
-      values.push("?");
-      params.push(data.user_id);
-    }
-
-    const numericRate = Number(data.rate);
-    if (!isNaN(numericRate)) {
-      fields.push("rate");
-      values.push("?");
-      params.push(numericRate);
-    }
-
-    if (data.review) {
-      fields.push("review");
-      values.push("?");
-      params.push(data.review);
+    for (let key in data) {
+      updates.push(`${key} = ?`);
+      params.push(data[key]);
     }
 
     const query = `

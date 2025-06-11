@@ -15,13 +15,18 @@
  *           type: string
  *         location:
  *           type: string
- *         quantity:
+ *         quantity_value:
+ *           type: number
+ *           format: float
+ *         quantity_unit:
  *           type: string
+ *           enum: [kg, g, liter, ml, pcs]
  *         expiry_date:
  *           type: string
  *           format: date
  *         donation_status:
  *           type: string
+ *           enum: [available, confirmed, completed, canceled]
  *         donation_picture:
  *           type: string
  *           nullable: true
@@ -35,7 +40,8 @@
  *         - title
  *         - description
  *         - location
- *         - quantity
+ *         - quantity_value
+ *         - quantity_unit
  *         - expiry_date
  *       properties:
  *         title:
@@ -44,8 +50,12 @@
  *           type: string
  *         location:
  *           type: string
- *         quantity:
+ *         quantity_value:
+ *           type: number
+ *           format: float
+ *         quantity_unit:
  *           type: string
+ *           enum: [kg, g, liter, ml, pcs]
  *         expiry_date:
  *           type: string
  *           format: date
@@ -60,7 +70,7 @@
  *       properties:
  *         donation_status:
  *           type: string
- *           enum: [pending, confirmed, completed, rejected]
+ *           enum: [available, confirmed, completed, canceled]
  */
 
 /**
